@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كويز طرق حفظ الأغذية – 200 سؤال</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161922;
+    --card: #1e2330;
+    --border: #2a3045;
+    --accent: #3eb489;
+    --accent2: #1a8c65;
+    --accent-glow: rgba(62,180,137,0.18);
+    --gold: #f0c040;
+    --text: #e8eaf0;
+    --muted: #7a8499;
+    --correct: #3eb489;
+    --wrong: #e05c5c;
+    --correct-bg: rgba(62,180,137,0.12);
+    --wrong-bg: rgba(224,92,92,0.12);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== HOME ===== */
+  #home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: radial-gradient(ellipse at 60% 0%, rgba(62,180,137,0.10) 0%, transparent 65%);
+  }
+
+  .home-logo {
+    width: 88px; height: 88px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.6rem;
+    margin-bottom: 1.4rem;
+    box-shadow: 0 0 38px var(--accent-glow);
+  }
+
+  .home-title {
+    font-size: 2rem; font-weight: 900;
+    text-align: center;
+    background: linear-gradient(135deg, #fff 40%, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.3; margin-bottom: .5rem;
+  }
+
+  .home-sub {
+    color: var(--muted); font-size: .95rem;
+    text-align: center; margin-bottom: 2.5rem;
+  }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: 100%; max-width: 520px;
+    margin-bottom: 2rem;
+  }
+
+  .mode-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.4rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .22s;
+  }
+  .mode-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 22px var(--accent-glow);
+    transform: translateY(-3px);
+  }
+  .mode-card.selected {
+    border-color: var(--accent);
+    background: rgba(62,180,137,0.10);
+    box-shadow: 0 0 22px var(--accent-glow);
+  }
+
+  .mode-icon { font-size: 2rem; margin-bottom: .5rem; }
+  .mode-label { font-weight: 700; font-size: 1rem; margin-bottom: .25rem; }
+  .mode-desc { font-size: .78rem; color: var(--muted); }
+
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none; border-radius: 50px;
+    padding: .9rem 3rem;
+    font-size: 1.1rem; font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 24px var(--accent-glow);
+    transition: all .22s;
+    letter-spacing: .5px;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
+
+  .stats-bar {
+    display: flex; gap: 2rem;
+    margin-bottom: 2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 2rem;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 1.6rem; font-weight: 900; color: var(--accent); }
+  .stat-label { font-size: .78rem; color: var(--muted); }
+
+  /* ===== QUIZ ===== */
+  #quiz {
+    min-height: 100vh;
+    padding: 1.2rem 1rem 5rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .quiz-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.4rem;
+    gap: .8rem;
+    flex-wrap: wrap;
+  }
+
+  .back-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 50px;
+    padding: .45rem 1.1rem;
+    font-size: .88rem;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all .18s;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .progress-wrap {
+    flex: 1; min-width: 120px;
+  }
+  .progress-info {
+    display: flex; justify-content: space-between;
+    font-size: .78rem; color: var(--muted);
+    margin-bottom: .35rem;
+  }
+  .progress-bar-bg {
+    background: var(--border);
+    border-radius: 99px;
+    height: 7px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+
+  .score-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: .4rem .9rem;
+    font-size: .88rem;
+    display: flex; align-items: center; gap: .4rem;
+    white-space: nowrap;
+  }
+  .score-pill .score-num { font-weight: 700; color: var(--accent); }
+
+  /* Question card */
+  .q-type-badge {
+    display: inline-block;
+    background: rgba(62,180,137,0.15);
+    color: var(--accent);
+    border-radius: 50px;
+    padding: .25rem .85rem;
+    font-size: .78rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: .3px;
+  }
+
+  .q-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.6rem 1.4rem;
+    margin-bottom: 1.2rem;
+    transition: border-color .2s;
+  }
+
+  .q-num {
+    color: var(--muted);
+    font-size: .8rem;
+    margin-bottom: .6rem;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .q-num span { color: var(--accent); font-weight: 700; }
+
+  .q-text {
+    font-size: 1.05rem; font-weight: 600;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* TF Options */
+  .tf-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .8rem; margin-top: 1.2rem;
+  }
+
+  .opt-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .18s;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .opt-btn.correct {
+    border-color: var(--correct);
+    background: var(--correct-bg);
+    color: var(--correct);
+  }
+  .opt-btn.wrong {
+    border-color: var(--wrong);
+    background: var(--wrong-bg);
+    color: var(--wrong);
+  }
+  .opt-btn:disabled { cursor: default; }
+
+  /* MCQ Options */
+  .mcq-list { display: flex; flex-direction: column; gap: .7rem; margin-top: 1.2rem; }
+
+  .mcq-opt {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: .85rem 1.1rem;
+    font-family: 'Cairo', sans-serif;
+    font-size: .97rem; font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .18s;
+    text-align: right;
+    display: flex; align-items: center; gap: .7rem;
+  }
+  .mcq-opt .opt-letter {
+    min-width: 30px; height: 30px;
+    background: var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .82rem; font-weight: 700;
+    color: var(--muted);
+    transition: all .18s;
+    flex-shrink: 0;
+  }
+  .mcq-opt:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .mcq-opt:hover:not(:disabled) .opt-letter {
+    background: var(--accent); color: #fff;
+  }
+  .mcq-opt.correct { border-color: var(--correct); background: var(--correct-bg); }
+  .mcq-opt.correct .opt-letter { background: var(--correct); color: #fff; }
+  .mcq-opt.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .mcq-opt.wrong .opt-letter { background: var(--wrong); color: #fff; }
+  .mcq-opt:disabled { cursor: default; }
+
+  /* Feedback */
+  .feedback-box {
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+    margin-top: .8rem;
+    font-size: .93rem; font-weight: 600;
+    display: flex; align-items: center; gap: .6rem;
+    animation: fadeUp .25s ease;
+  }
+  .feedback-box.correct { background: var(--correct-bg); color: var(--correct); border: 1px solid rgba(62,180,137,.3); }
+  .feedback-box.wrong { background: var(--wrong-bg); color: #e07070; border: 1px solid rgba(224,92,92,.3); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Next button */
+  .next-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none; border-radius: 50px;
+    padding: .9rem;
+    font-size: 1rem; font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all .2s;
+    display: none;
+  }
+  .next-btn.visible { display: block; }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px var(--accent-glow); }
+
+  /* ===== RESULTS ===== */
+  #results {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .result-ring {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent) 0% var(--pct, 0%), var(--border) 0%);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 40px var(--accent-glow);
+    position: relative;
+  }
+  .result-ring-inner {
+    width: 120px; height: 120px;
+    background: var(--card);
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .result-pct { font-size: 2rem; font-weight: 900; color: var(--accent); }
+  .result-pct-label { font-size: .75rem; color: var(--muted); }
+
+  .result-title {
+    font-size: 1.6rem; font-weight: 900;
+    text-align: center; margin-bottom: .4rem;
+  }
+  .result-sub { color: var(--muted); font-size: .9rem; text-align: center; margin-bottom: 2rem; }
+
+  .result-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: .8rem; width: 100%; margin-bottom: 2rem;
+  }
+  .result-stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+  }
+  .result-stat .r-num { font-size: 1.5rem; font-weight: 900; margin-bottom: .25rem; }
+  .result-stat .r-label { font-size: .75rem; color: var(--muted); }
+  .r-num.green { color: var(--correct); }
+  .r-num.red { color: var(--wrong); }
+  .r-num.gold { color: var(--gold); }
+
+  .result-actions {
+    display: flex; flex-direction: column; gap: .8rem; width: 100%;
+  }
+  .btn-outline {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    border-radius: 50px;
+    padding: .8rem;
+    font-size: .97rem; font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .wrong-review {
+    width: 100%; margin-top: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .wrong-review-header {
+    padding: 1rem 1.2rem;
+    font-weight: 700;
+    background: rgba(224,92,92,.08);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: .5rem;
+    cursor: pointer;
+  }
+  .wrong-review-body { padding: 1rem 1.2rem; display: none; }
+  .wrong-review-body.open { display: block; }
+
+  .wrong-item {
+    border-bottom: 1px solid var(--border);
+    padding: .8rem 0;
+    font-size: .88rem;
+  }
+  .wrong-item:last-child { border-bottom: none; }
+  .wrong-item .wi-q { color: var(--muted); margin-bottom: .4rem; line-height: 1.6; }
+  .wrong-item .wi-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: .2rem; }
+  .wi-wrong { color: var(--wrong); font-weight: 700; }
+  .wi-correct { color: var(--correct); font-weight: 700; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-logo">🌿</div>
+  <div class="home-title">طرق حفظ الأغذية</div>
+  <div class="home-sub">بنك أسئلة شامل – 200 سؤال تفاعلي</div>
+
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-num">100</div><div class="stat-label">صح / خطأ</div></div>
+    <div class="stat-item"><div class="stat-num">100</div><div class="stat-label">اختيار من متعدد</div></div>
+    <div class="stat-item"><div class="stat-num">200</div><div class="stat-label">إجمالي الأسئلة</div></div>
+  </div>
+
+  <div style="font-weight:700; margin-bottom:.8rem; color:var(--muted); font-size:.9rem;">اختر وضع الكويز</div>
+  <div class="mode-grid">
+    <div class="mode-card selected" onclick="selectMode('all')">
+      <div class="mode-icon">📚</div>
+      <div class="mode-label">كل الأسئلة</div>
+      <div class="mode-desc">200 سؤال متنوع</div>
+    </div>
+    <div class="mode-card" onclick="selectMode('tf')">
+      <div class="mode-icon">✅</div>
+      <div class="mode-label">صح أو خطأ</div>
+      <div class="mode-desc">100 سؤال فقط</div>
+    </div>
+    <div class="mode-card" onclick="selectMode('mcq')">
+      <div class="mode-icon">🔤</div>
+      <div class="mode-label">اختيار من متعدد</div>
+      <div class="mode-desc">100 سؤال فقط</div>
+    </div>
+    <div class="mode-card" onclick="selectMode('random50')">
+      <div class="mode-icon">🎲</div>
+      <div class="mode-label">50 سؤال عشوائي</div>
+      <div class="mode-desc">اختبار سريع</div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startQuiz()">ابدأ الكويز ←</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="quiz-topbar">
+    <button class="back-btn" onclick="goHome()">🏠 رئيسية</button>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="prog-text">سؤال 1 من 200</span>
+        <span id="prog-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="prog-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="score-pill">✨ <span class="score-num" id="live-score">0</span></div>
+  </div>
+
+  <div id="q-container"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">السؤال التالي ←</button>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="result-ring" id="result-ring">
+    <div class="result-ring-inner">
+      <div class="result-pct" id="res-pct">0%</div>
+      <div class="result-pct-label">النتيجة</div>
+    </div>
+  </div>
+
+  <div class="result-title" id="res-title">أحسنت! 🎉</div>
+  <div class="result-sub" id="res-sub">أنهيت الكويز بنجاح</div>
+
+  <div class="result-grid">
+    <div class="result-stat">
+      <div class="r-num green" id="res-correct">0</div>
+      <div class="r-label">✅ صح</div>
+    </div>
+    <div class="result-stat">
+      <div class="r-num red" id="res-wrong">0</div>
+      <div class="r-label">❌ غلط</div>
+    </div>
+    <div class="result-stat">
+      <div class="r-num gold" id="res-total">0</div>
+      <div class="r-label">📊 المجموع</div>
+    </div>
+  </div>
+
+  <div class="result-actions">
+    <button class="start-btn" onclick="restartQuiz()">🔄 إعادة المحاولة</button>
+    <button class="btn-outline" onclick="goHome()">🏠 الرئيسية</button>
+  </div>
+
+  <div class="wrong-review" id="wrong-review-section" style="display:none">
+    <div class="wrong-review-header" onclick="toggleWrongReview()">
+      ❌ مراجعة الأسئلة الخاطئة <span id="wrong-count-badge"></span> <span style="margin-right:auto">▼</span>
+    </div>
+    <div class="wrong-review-body" id="wrong-review-body"></div>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const TF_QUESTIONS = [
+  { q: "تقسم الأغذية تبعاً لسرعة فسادها إلى أغذية سريعة الفساد، ومتوسطة الفساد، وغير معرضة للفساد السريع", a: true },
+  { q: "الأغذية سريعة الفساد غالباً منخفضة الرطوبة مثل السكر والملح", a: false },
+  { q: "الخضروات الورقية واللحوم والأسماك والحليب من أمثلة الأغذية القابلة للفساد السريع", a: true },
+  { q: "الحبوب والبقول الجافة يمكن حفظها مدة طويلة إذا خُزنت في مخازن جافة جيدة التهوية", a: true },
+  { q: "البطاطس والتفاح من أمثلة الأغذية متوسطة التعرض للفساد", a: true },
+  { q: "صلاحية الغذاء للاستهلاك تتطلب خلوه من التلوث والتغيرات غير المرغوبة", a: true },
+  { q: "أي تغير بسيط في لون الغذاء يعني بالضرورة أنه أصبح غير صالح للاستهلاك", a: false },
+  { q: "فساد الغذاء قد يظهر في صورة تغير اللون أو القوام أو الرائحة أو الطعم", a: true },
+  { q: "تلوث الغذاء بالميكروبات لا يعد فساداً إلا إذا كانت الميكروبات ضارة أو سببت تغيراً واضحاً في صفات الغذاء", a: true },
+  { q: "العوامل المسببة لفساد الأغذية تشمل عوامل حيوية وكيميائية وطبيعية", a: true },
+  { q: "البكتيريا تعد من أهم عوامل الفساد في الأغذية", a: true },
+  { q: "كل أنواع البكتيريا الموجودة في الغذاء ممرضة للإنسان", a: false },
+  { q: "قد تسبب البكتيريا فساداً مباشراً للغذاء أو تسمماً نتيجة إفراز سموم بكتيرية", a: true },
+  { q: "Clostridium botulinum تنمو غالباً في الظروف غير الهوائية مثل بعض الأغذية المعلبة غير الحمضية", a: true },
+  { q: "Staphylococcus aureus قد تسبب تسمماً غذائياً بسبب السموم التي تفرزها في الغذاء", a: true },
+  { q: "بكتيريا حمض اللاكتيك تسبب دائماً فساداً ولا تستخدم صناعياً", a: false },
+  { q: "تستخدم بعض أنواع Lactobacillus وStreptococcus في صناعة الزبادي", a: true },
+  { q: "الخمائر قد تسبب تعكيراً لعصائر الفاكهة وظهور طعم غير مرغوب", a: true },
+  { q: "من الخمائر النافعة صناعياً خميرة الخباز Saccharomyces cerevisiae", a: true },
+  { q: "الفطريات لا تستطيع النمو على الأغذية السكرية مثل المربى", a: false },
+  { q: "Aspergillus niger قد ينمو على بعض الأغذية ويسبب مظهراً غير مرغوب", a: true },
+  { q: "بعض فطريات Penicillium تستخدم في صناعة وتسوية بعض أنواع الجبن", a: true },
+  { q: "الإنزيمات مواد بروتينية تعمل كعوامل مساعدة للتفاعلات الحيوية", a: true },
+  { q: "الإنزيمات تستهلك بكميات كبيرة في كل تفاعل ولا تعمل إلا داخل الخلية الحية", a: false },
+  { q: "الإنزيمات المؤكسدة قد تسبب ألواناً غير مرغوبة في الأغذية", a: true },
+  { q: "إنزيم الليبيز يحلل الدهون والزيوت إلى أحماض دهنية وجليسرول", a: true },
+  { q: "إنزيمات البكتين تساعد في ترويق عصائر الفاكهة", a: true },
+  { q: "إنزيم الرينين يساعد على تجبن الحليب في وجود أيونات الكالسيوم", a: true },
+  { q: "التلون البني غير الإنزيمي يعد من عوامل الفساد الكيميائية", a: true },
+  { q: "التزنخ من مظاهر الفساد المرتبطة غالباً بالدهون والزيوت", a: true },
+  { q: "الأكسجين والحرارة والضوء لا تؤثر في سرعة تفاعلات الفساد الكيميائي", a: false },
+  { q: "العوامل الطبيعية مثل الحرارة والضغط والرطوبة قد تؤثر في جودة الغذاء", a: true },
+  { q: "الحشرات والقوارض قد تسبب تلفاً ميكانيكياً وتلوثاً للأغذية المخزنة", a: true },
+  { q: "التجميد الخاطئ لا يسبب أي تلف في قوام الغذاء", a: false },
+  { q: "حفظ الأغذية بالحرارة المنخفضة يهدف إلى إبطاء نشاط الميكروبات والإنزيمات", a: true },
+  { q: "التبريد يوقف جميع الكائنات الدقيقة بصورة نهائية", a: false },
+  { q: "التجميد يخفض الماء الحر المتاح لنمو الأحياء الدقيقة", a: true },
+  { q: "يؤدي التجميد البطيء غالباً إلى تكوين بلورات ثلجية كبيرة قد تؤثر في القوام", a: true },
+  { q: "التجميد السريع يساعد على تكوين بلورات ثلجية صغيرة نسبياً", a: true },
+  { q: "السلق أو التبييض قبل التجميد يستخدم لإيقاف نشاط الإنزيمات في كثير من الخضروات", a: true },
+  { q: "التبييض قبل التجميد لا علاقة له باللون أو النكهة أو الحمل الميكروبي", a: false },
+  { q: "التعبئة الجيدة للأغذية المجمدة تقلل فقد الرطوبة وحدوث حروق التجميد", a: true },
+  { q: "حروق التجميد تنتج غالباً من فقد الرطوبة وسوء التغليف أثناء التخزين المجمد", a: true },
+  { q: "لا يجوز إعادة تجميد الغذاء بعد ذوبانه إذا تعرض لظروف تسمح بنمو الميكروبات", a: true },
+  { q: "الغرض من الحفظ بالتجفيف هو خفض الرطوبة والنشاط المائي إلى مستوى يحد من الفساد", a: true },
+  { q: "التجفيف يزيد النشاط المائي ويشجع النمو الميكروبي", a: false },
+  { q: "التجفيف الشمسي من أقدم طرق حفظ الأغذية", a: true },
+  { q: "التجفيف الصناعي يسمح بتحكم أفضل في درجة الحرارة وسرعة الهواء مقارنة بالتجفيف الشمسي التقليدي", a: true },
+  { q: "التجفيف بالرش مناسب للسوائل والمحاليل مثل اللبن والعصائر المركزة", a: true },
+  { q: "التجفيف بالأسطوانة يستخدم غالباً مع الأغذية السائلة أو شبه السائلة", a: true },
+  { q: "التجفيف بالتجميد يحافظ عادة على اللون والنكهة بدرجة جيدة لكنه مرتفع التكلفة", a: true },
+  { q: "كل الأغذية يمكن تجفيفها بالطريقة نفسها دون اختلاف في المعاملات الأولية", a: false },
+  { q: "السلق قبل تجفيف بعض الخضروات يساعد على تثبيط الإنزيمات", a: true },
+  { q: "الكبرتة أو استخدام ثاني أكسيد الكبريت قد يساعد على حفظ لون بعض الفواكه المجففة", a: true },
+  { q: "زيادة سمك شرائح المادة الغذائية تسرع التجفيف دائماً", a: false },
+  { q: "ارتفاع سرعة الهواء الساخن غالباً يحسن انتقال الحرارة والكتلة في التجفيف ضمن حدود مناسبة", a: true },
+  { q: "التجفيف الزائد قد يسبب فقداً في الجودة الحسية والغذائية", a: true },
+  { q: "التجفيف بالرغوة يستخدم لتحويل بعض السوائل إلى رغوة قبل تجفيفها لتسهيل العملية", a: true },
+  { q: "التجفيف بالميكروويف يعتمد على التسخين الحجمي داخل المادة الغذائية", a: true },
+  { q: "التجفيف لا يحتاج إلى تعبئة مناسبة بعد انتهاء العملية", a: false },
+  { q: "الحفظ بالمواد الكيميائية يعتمد على إضافة مواد تثبط الميكروبات أو الإنزيمات أو الأكسدة ضمن حدود مسموحة", a: true },
+  { q: "يجب استخدام المواد الحافظة دون أي حدود أو تشريعات", a: false },
+  { q: "الملح يخفض النشاط المائي ويساعد على حفظ بعض الأغذية", a: true },
+  { q: "السكر بتركيزات عالية يستخدم في حفظ المربى والجيلي", a: true },
+  { q: "الأحماض العضوية تسهم في خفض pH مما يعيق نمو كثير من الميكروبات", a: true },
+  { q: "حمض البنزويك وأملاحه أكثر فاعلية في الوسط الحامضي", a: true },
+  { q: "حمض السوربيك وأملاحه تستخدم لتثبيط الخمائر والفطريات في بعض الأغذية", a: true },
+  { q: "الكبريتات قد تستخدم لحفظ اللون وتقليل الاسمرار في بعض المنتجات", a: true },
+  { q: "النيتريت والنترات تستخدم في بعض منتجات اللحوم المعالجة لأغراض حفظ ولون ونكهة", a: true },
+  { q: "مضادات الأكسدة تستخدم للحد من تزنخ الدهون", a: true },
+  { q: "التخليل يعتمد أساساً على الملح والحموضة ونشاط بكتيريا حمض اللاكتيك في بعض المنتجات", a: true },
+  { q: "التدخين لا يساهم مطلقاً في الحفظ وليس له إلا دور في اللون", a: false },
+  { q: "التدخين قد يضيف مركبات مثبطة للميكروبات ومضادة للأكسدة مع نكهة مميزة", a: true },
+  { q: "الحفظ بالإشعاع يستخدم طاقة إشعاعية لتقليل الحمل الميكروبي أو الآفات أو إطالة مدة الحفظ", a: true },
+  { q: "التشعيع الغذائي يجعل الغذاء مشعاً دائماً وغير صالح للأكل", a: false },
+  { q: "جرعات التشعيع تختلف تبعاً للغرض مثل تثبيط الإنبات أو القضاء على الحشرات أو خفض الميكروبات", a: true },
+  { q: "يمكن استخدام التشعيع لتثبيط إنبات البطاطس والبصل", a: true },
+  { q: "التشعيع قد يستخدم في مكافحة الحشرات في الحبوب وبعض المنتجات المخزنة", a: true },
+  { q: "التشعيع لا يغني عن الممارسات الصحية الجيدة في التداول والتصنيع", a: true },
+  { q: "من مزايا التشعيع أنه قد يعالج الغذاء بعد التعبئة في بعض التطبيقات", a: true },
+  { q: "الإشعاع المؤين لا يسبب أي تغيرات كيميائية إطلاقاً في الغذاء", a: false },
+  { q: "اختيار جرعة التشعيع يجب أن يوازن بين السلامة والجودة", a: true },
+  { q: "الأغذية عالية الرطوبة أكثر قابلية للفساد السريع من الأغذية الجافة غالباً", a: true },
+  { q: "انخفاض الرطوبة في الحبوب يقلل قابلية نمو الفطريات أثناء التخزين", a: true },
+  { q: "النظافة أثناء التصنيع والتداول عامل أساسي في تقليل التلوث الغذائي", a: true },
+  { q: "العبوات المنتفخة في الأغذية المعلبة قد تشير إلى نشاط ميكروبي وإنتاج غاز", a: true },
+  { q: "وجود رائحة كريهة دائماً شرط لازم لحدوث التسمم الغذائي", a: false },
+  { q: "بعض السموم الميكروبية قد توجد دون ظهور علامات فساد واضحة على الغذاء", a: true },
+  { q: "الحفظ الناجح غالباً يعتمد على الجمع بين أكثر من عامل مثل الحرارة والرطوبة والحموضة والتعبئة", a: true },
+  { q: "كل طرق الحفظ تهدف إلى رفع القيمة الغذائية فقط دون التأثير في السلامة", a: false },
+  { q: "اختيار طريقة الحفظ يعتمد على نوع الغذاء وتركيبه ومدة الحفظ المطلوبة", a: true },
+  { q: "الأغذية المعلبة غير الحمضية تحتاج إلى عناية حرارية وصحية أكبر من الأغذية عالية الحموضة", a: true },
+  { q: "تجفيف الغذاء يقلل وزنه وحجمه مما يسهل النقل والتخزين", a: true },
+  { q: "الغذاء المجفف قد يمتص الرطوبة من الجو إذا لم يعبأ في عبوات مناسبة", a: true },
+  { q: "الحفظ بالتبريد مناسب وحده لكل المنتجات لمدة غير محدودة", a: false },
+  { q: "المعاملات الأولية قبل الحفظ مثل الفرز والغسيل والتقشير تؤثر في جودة المنتج النهائي", a: true },
+  { q: "الفرز يستهدف إزالة المواد التالفة أو غير المطابقة قبل التصنيع", a: true },
+  { q: "الغسيل قد يقلل الأتربة والشوائب وبعض الحمل الميكروبي السطحي", a: true },
+  { q: "إهمال ضبط درجة الحرارة والرطوبة أثناء التخزين قد يسرع فساد الغذاء", a: true },
+  { q: "ارتفاع درجة الحرارة غير الملائمة أثناء التداول قد يزيد سرعة نمو الميكروبات وتدهور الغذاء", a: true },
+];
+
+const MCQ_QUESTIONS = [
+  { q: "أي الأغذية التالية تعد غالباً سريعة الفساد؟", opts: ["السكر","الحبوب الجافة","الحليب","ملح الطعام"], a: 2 },
+  { q: "أي مما يلي مثال لأغذية غير معرضة للفساد السريع؟", opts: ["اللحوم الطازجة","الأسماك","الخضروات الورقية","البقول الجافة"], a: 3 },
+  { q: "الأغذية متوسطة الفساد تشمل غالباً:", opts: ["البطاطس والتفاح","الحليب والأسماك","السكر والملح","الحبوب الجافة فقط"], a: 0 },
+  { q: "من شروط صلاحية الغذاء للاستهلاك:", opts: ["زيادة الرطوبة دائماً","خلوه من التلوث والتغيرات غير المرغوبة","وجود رائحة نفاذة","ارتفاع الحموضة في كل الحالات"], a: 1 },
+  { q: "يُعرَّف فساد الغذاء بأنه:", opts: ["تحسن القوام","أي تغير غير مرغوب في صفات الغذاء","زيادة الوزن","انخفاض السعر"], a: 1 },
+  { q: "من مظاهر الفساد الحسية:", opts: ["تحسن اللون","ثبات الرائحة","ظهور رائحة غير طبيعية","زيادة القيمة التسويقية"], a: 2 },
+  { q: "العوامل الحيوية المسببة للفساد تشمل:", opts: ["البكتيريا والخمائر والفطريات والإنزيمات","الحرارة فقط","الضوء فقط","الضغط فقط"], a: 0 },
+  { q: "البكتيريا التي تنمو في ظروف غير هوائية وقد ترتبط بالأغذية المعلبة غير الحمضية هي:", opts: ["Lactobacillus bulgaricus","Clostridium botulinum","Penicillium roqueforti","Saccharomyces cerevisiae"], a: 1 },
+  { q: "Staphylococcus aureus تسبب التسمم الغذائي غالباً عن طريق:", opts: ["رفع نسبة السكر","إفراز سم بكتيري في الغذاء","خفض الرطوبة","تكوين بلورات ثلج"], a: 1 },
+  { q: "بكتيريا حمض اللاكتيك قد تكون نافعة في صناعة:", opts: ["الزبادي","الثلج","الملح","العبوات المعدنية"], a: 0 },
+  { q: "الخمائر قد تسبب في العصائر:", opts: ["تعكيراً وتغيراً في الطعم","تجميداً مباشراً","انخفاضاً في الحجم فقط","اختفاء اللون تماماً"], a: 0 },
+  { q: "خميرة الخباز هي:", opts: ["Aspergillus niger","Saccharomyces cerevisiae","Clostridium botulinum","Rhizopus nigricans"], a: 1 },
+  { q: "الفطر الذي قد ينمو على سطح الخبز الطري ويعطي مظهراً غير مرغوب هو:", opts: ["Rhizopus nigricans","Streptococcus thermophilus","Leuconostoc","Clostridium"], a: 0 },
+  { q: "من الفطريات النافعة في تصنيع بعض أنواع الجبن:", opts: ["Penicillium roqueforti","Staphylococcus aureus","E. coli","Clostridium botulinum"], a: 0 },
+  { q: "الإنزيمات هي مواد غالباً:", opts: ["دهنية","بروتينية","معدنية فقط","غازية"], a: 1 },
+  { q: "إنزيم الليبيز يؤثر أساساً في:", opts: ["البروتينات","الدهون والزيوت","الأملاح","الألياف المعدنية"], a: 1 },
+  { q: "الإنزيم المستخدم في تجبن الحليب هو:", opts: ["الرينين","الليبيز","المالتيز","الإنفرتيز"], a: 0 },
+  { q: "إنزيمات البكتين مهمة في:", opts: ["ترويق عصائر الفاكهة","تجميد اللحوم","تكوين الملح","رفع ضغط العبوة"], a: 0 },
+  { q: "التلون البني غير الإنزيمي يحدث غالباً نتيجة:", opts: ["تفاعلات كيميائية أثناء التصنيع أو التخزين","الغسيل بالماء البارد فقط","انعدام الأكسجين دائماً","تجميد فوري"], a: 0 },
+  { q: "التزنخ يرتبط عادة بفساد:", opts: ["الدهون","الأملاح","الماء","المعادن"], a: 0 },
+  { q: "من العوامل الطبيعية المؤثرة في الفساد:", opts: ["الحرارة والرطوبة والضغط","السكر فقط","البروتين فقط","العبوة فقط"], a: 0 },
+  { q: "انتفاخ علبة غذائية قد يدل على:", opts: ["إنتاج غاز نتيجة نشاط ميكروبي","نقص وزن العبوة","جفاف كامل","انخفاض ضغط الهواء الخارجي فقط"], a: 0 },
+  { q: "حفظ الأغذية بالحرارة المنخفضة يهدف إلى:", opts: ["تسريع نشاط الإنزيمات","إبطاء نشاط الميكروبات والإنزيمات","رفع النشاط المائي","زيادة النمو الفطري"], a: 1 },
+  { q: "الفرق الرئيسي بين التبريد والتجميد أن التجميد:", opts: ["يبقي الماء كله سائلاً","يحول جزءاً كبيراً من الماء إلى ثلج","يرفع الحرارة","يزيد نشاط الميكروبات"], a: 1 },
+  { q: "التجميد السريع يؤدي غالباً إلى:", opts: ["بلورات ثلجية أصغر","بلورات أكبر جداً دائماً","تعفن مباشر","انعدام الحاجة للتغليف"], a: 0 },
+  { q: "التجميد البطيء قد يضر القوام بسبب:", opts: ["تكوين بلورات ثلجية كبيرة","غياب الماء","ارتفاع السكر","زيادة الملح"], a: 0 },
+  { q: "التبييض قبل التجميد يستخدم غالباً من أجل:", opts: ["تنشيط الإنزيمات","تثبيط الإنزيمات وتقليل الحمل السطحي","رفع الرطوبة فقط","زيادة التزنخ"], a: 1 },
+  { q: "حروق التجميد ترتبط غالباً بـ:", opts: ["فقد الرطوبة وسوء التغليف","زيادة الملح","زيادة السكر","النمو الفوري للبكتيريا"], a: 0 },
+  { q: "من متطلبات تخزين الأغذية المجمدة:", opts: ["تذبذب حراري مستمر","درجة حرارة منخفضة ثابتة نسبياً","تعريضها للشمس","فتح العبوة دائماً"], a: 1 },
+  { q: "الغذاء المذاب يجب التعامل معه بحذر لأن:", opts: ["نشاط الميكروبات قد يعود إذا ارتفعت الحرارة","كل السموم تختفي تلقائياً","التجميد يجعله معقماً دائماً","لا يحدث له أي تغير"], a: 0 },
+  { q: "الهدف الأساسي من التجفيف هو:", opts: ["زيادة الماء","خفض الرطوبة والنشاط المائي","رفع الوزن","إزالة البروتين"], a: 1 },
+  { q: "أقدم طرق حفظ الأغذية بالتجفيف هي غالباً:", opts: ["التجفيف الشمسي","التجفيف بالتجميد","التجفيف بالرش","التجفيف بالميكروويف"], a: 0 },
+  { q: "من عيوب التجفيف الشمسي التقليدي:", opts: ["صعوبة التحكم في الظروف واحتمال التلوث","ارتفاع التكلفة جداً دائماً","عدم الاعتماد على الشمس","عدم فقد ماء"], a: 0 },
+  { q: "التجفيف الصناعي يتميز غالباً بـ:", opts: ["تحكم أفضل في الحرارة والهواء","تعريض المنتج للأتربة عمداً","عدم إمكانية ضبط الزمن","اعتماده الكامل على المطر"], a: 0 },
+  { q: "التجفيف بالرش مناسب أكثر لـ:", opts: ["المواد السائلة","القطع المعدنية","اللحوم الكاملة فقط","الحبوب الصلبة فقط"], a: 0 },
+  { q: "التجفيف بالأسطوانة يناسب غالباً:", opts: ["السوائل والعجائن الرقيقة","العبوات الزجاجية","الأغذية المجمدة فقط","الأسماك كاملة الحجم فقط"], a: 0 },
+  { q: "التجفيف بالتجميد يتميز بأنه:", opts: ["يحافظ على جودة عالية نسبياً مع تكلفة مرتفعة","أرخص الطرق دائماً","يسبب احتراقاً مباشراً","يحتاج تثليجاً أو تبريداً"], a: 0 },
+  { q: "في التجفيف، زيادة سمك الشرائح تؤدي غالباً إلى:", opts: ["إبطاء خروج الرطوبة","تسريع التجفيف دائماً","إيقاف التبخر","تحويل الماء إلى ملح"], a: 0 },
+  { q: "رفع سرعة الهواء الساخن ضمن الحدود المناسبة يساعد على:", opts: ["تحسين انتقال الحرارة والكتلة","وقف التجفيف","رفع النشاط المائي","منع التبخر"], a: 0 },
+  { q: "من المعاملات الأولية قبل تجفيف الخضروات:", opts: ["السلق أو التبييض","التعقيم بالإشعاع دائماً","إضافة زيوت فقط","زيادة سمك القطع"], a: 0 },
+  { q: "تستخدم الكبرتة في بعض الفواكه المجففة بهدف:", opts: ["المساعدة على حفظ اللون وتقليل الاسمرار","زيادة التزنخ","رفع pH إلى أقصى حد","منع كل تبخر"], a: 0 },
+  { q: "التعبئة بعد التجفيف مهمة لأنها:", opts: ["تمنع امتصاص الرطوبة والتلوث","تزيد التعرض للهواء","تخفض جودة المنتج عمداً","تلغي الحاجة للنظافة"], a: 0 },
+  { q: "التجفيف بالرغوة يعتمد على:", opts: ["تكوين رغوة من السائل ثم تجفيفها","تجميد المنتج فقط","إضافة ملح فقط","ضغط العبوة"], a: 0 },
+  { q: "التجفيف بالميكروويف يعتمد على:", opts: ["تسخين حجمي للمادة","تبريد ميكانيكي","إضافة ثاني أكسيد الكبريت فقط","إزالة الأكسجين يدوياً"], a: 0 },
+  { q: "من نتائج التجفيف الناجح:", opts: ["انخفاض الوزن والحجم","زيادة الماء الحر","زيادة سرعة الفساد دائماً","انعدام الحاجة للتخزين"], a: 0 },
+  { q: "الحفظ الكيميائي يعتمد على:", opts: ["إضافة مواد مثبطة ضمن حدود مسموحة","إضافة أي مادة بأي كمية","ترك الغذاء مكشوفاً","زيادة التلوث"], a: 0 },
+  { q: "الملح يحفظ بعض الأغذية لأنه:", opts: ["يخفض النشاط المائي ويسحب الماء أسموزياً","يزيد الماء الحر","يرفع نمو البكتيريا دائماً","يزيل البروتينات كلها"], a: 0 },
+  { q: "السكر بتركيز عال يستخدم أساساً في:", opts: ["المربى والجيلي","اللحوم المدخنة فقط","الثلج","المياه المعدنية"], a: 0 },
+  { q: "خفض pH يفيد في الحفظ لأنه:", opts: ["يحد من نمو كثير من الميكروبات","يزيد نمو كل البكتيريا","يرفع النشاط المائي","يزيل لون الغذاء دائماً"], a: 0 },
+  { q: "حمض البنزويك وأملاحه تكون أكثر فاعلية غالباً في:", opts: ["الوسط الحامضي","الوسط القلوي الشديد","الوسط الجاف تماماً فقط","الماء المقطر فقط"], a: 0 },
+  { q: "السوربات تستخدم غالباً لتثبيط:", opts: ["الخمائر والفطريات","بلورات الثلج","الهواء","الأملاح المعدنية"], a: 0 },
+  { q: "الكبريتات في الأغذية قد تستخدم من أجل:", opts: ["تقليل الاسمرار وحفظ اللون","زيادة الأكسدة","تكوين بلورات ثلج","إزالة كل سكريات الغذاء"], a: 0 },
+  { q: "النيتريت يستخدم في بعض منتجات اللحوم للمساعدة في:", opts: ["تثبيت اللون والمساهمة في الحفظ","زيادة التلوث","تجفيف الحبوب","ترويق العصير"], a: 0 },
+  { q: "مضادات الأكسدة تفيد أساساً في:", opts: ["تقليل تزنخ الدهون","زيادة التزنخ","رفع نمو العفن","خفض البروتين"], a: 0 },
+  { q: "التخليل يعتمد غالباً على:", opts: ["الملح والحموضة","التجميد فقط","التشعيع فقط","الدهون فقط"], a: 0 },
+  { q: "التدخين يضيف إلى الغذاء:", opts: ["نكهة ومركبات مثبطة جزئياً للميكروبات","ماء فقط","ثلجاً","أملاحاً معدنية فقط"], a: 0 },
+  { q: "من أمثلة حفظ اللحوم كيميائياً:", opts: ["المعالجة بالملح والنيتريت","الغسيل بالماء فقط","تركها في الشمس دون حماية","رفع درجة الحرارة قليلاً دون طهي"], a: 0 },
+  { q: "في استخدام المواد الحافظة يجب مراعاة:", opts: ["الحدود التشريعية والسلامة الصحية","الزيادة العشوائية","عدم كتابة البيانات","خلط كل المواد معاً"], a: 0 },
+  { q: "المواد الحافظة لا تصلح لتعويض:", opts: ["سوء النظافة والتصنيع الرديء","الالتزام بالحدود","التعبئة المناسبة","التخزين الصحيح"], a: 0 },
+  { q: "الحفظ بالإشعاع يعتمد على:", opts: ["طاقة إشعاعية مؤينة بجرعات محددة","إضافة ملح فقط","التجفيف الشمسي","التبريد العادي فقط"], a: 0 },
+  { q: "من استخدامات التشعيع الغذائي:", opts: ["تثبيط إنبات البطاطس والبصل","زيادة الإنبات","رفع الرطوبة","إزالة العبوات"], a: 0 },
+  { q: "يمكن استخدام التشعيع لمكافحة:", opts: ["الحشرات في بعض المنتجات المخزنة","الحرارة","الملح","الجفاف"], a: 0 },
+  { q: "تختلف جرعة التشعيع حسب:", opts: ["الغرض ونوع الغذاء","لون العبوة فقط","سعر المنتج فقط","شكل الملصق"], a: 0 },
+  { q: "الغذاء المشعع بطريقة صحيحة:", opts: ["لا يصبح مشعاً بذاته","يتحول دائماً إلى مصدر إشعاع","يفقد كل قيمته الغذائية","لا يحتاج أي ضوابط"], a: 0 },
+  { q: "من مزايا التشعيع:", opts: ["إمكان معالجة بعض الأغذية بعد التعبئة","زيادة التلوث","تحويل الماء إلى ثلج","إلغاء الحاجة للرقابة"], a: 0 },
+  { q: "من حدود التشعيع أنه:", opts: ["لا يغني عن الممارسات الصحية الجيدة","يعوض كل أخطاء التصنيع","يزيل كل السموم دائماً","يصلح لكل غذاء بلا قيود"], a: 0 },
+  { q: "اختيار الجرعة المناسبة يهدف إلى:", opts: ["تحقيق السلامة مع الحفاظ على الجودة","إتلاف المنتج عمداً","رفع التزنخ دائماً","زيادة الحشرات"], a: 0 },
+  { q: "المعاملات الأولية قبل الحفظ تشمل:", opts: ["الفرز والغسيل والتقشير والتقطيع","التلوث المتعمد","إهمال الفحص","التعبئة قبل التنظيف دائماً"], a: 0 },
+  { q: "الغرض من الفرز هو:", opts: ["استبعاد الثمار التالفة وغير المطابقة","زيادة الأجزاء الفاسدة","إضافة الملح","رفع درجة الحرارة"], a: 0 },
+  { q: "الغسيل يساعد على:", opts: ["إزالة الأتربة والشوائب وتقليل الحمل السطحي","زيادة التلوث دائماً","إيقاف كل الإنزيمات نهائياً","تجفيف المنتج كلياً"], a: 0 },
+  { q: "التقشير والتقطيع يؤثران في:", opts: ["مساحة السطح وسرعة المعاملة اللاحقة","المعادن فقط","الملصق","لون العبوة فقط"], a: 0 },
+  { q: "التعبئة الجيدة تساعد على:", opts: ["تقليل التلوث وفقد الرطوبة والتأكسد","زيادة الفساد","تعريض المنتج للحشرات","رفع النشاط الإنزيمي"], a: 0 },
+  { q: "تخزين الحبوب الجافة يحتاج أساساً إلى:", opts: ["جفاف وتهوية وحماية من الآفات","رطوبة عالية","ماء حر","حرارة مرتفعة دائماً"], a: 0 },
+  { q: "ارتفاع رطوبة المخزن يؤدي غالباً إلى:", opts: ["نمو الفطريات وزيادة الفساد","تحسن الحفظ","انخفاض النشاط الميكروبي دائماً","تجميد الحبوب"], a: 0 },
+  { q: "النشاط المائي يعبر عن:", opts: ["الماء المتاح لنمو الميكروبات والتفاعلات","وزن العبوة فقط","لون الغذاء","قيمة الملح"], a: 0 },
+  { q: "كلما انخفض النشاط المائي غالباً:", opts: ["انخفضت قدرة الميكروبات على النمو","زاد النمو دائماً","ارتفعت الرطوبة الحرة","زاد التلف الميكانيكي"], a: 0 },
+  { q: "الأغذية عالية الحموضة عادة تكون أقل ملاءمة لنمو:", opts: ["كثير من البكتيريا الممرضة","كل الفطريات بلا استثناء","الأملاح","الثلج"], a: 0 },
+  { q: "العوامل الحاجزة في الحفظ تعني:", opts: ["الجمع بين عدة عوامل مثبطة للفساد","استخدام عامل واحد فقط دائماً","إهمال التعبئة","زيادة التلوث"], a: 0 },
+  { q: "من أمثلة الجمع بين عوامل الحفظ:", opts: ["خفض pH مع الملح والتبريد","رفع الحرارة والرطوبة دون تعبئة","ترك المنتج مكشوفاً","زيادة الماء الحر"], a: 0 },
+  { q: "الفحص الحسي للغذاء يشمل:", opts: ["اللون والرائحة والطعم والقوام","الوزن فقط","السعر فقط","بلد المنشأ فقط"], a: 0 },
+  { q: "وجود سموم بكتيرية في الغذاء قد لا يصاحبه دائماً:", opts: ["رائحة فساد واضحة","خطر صحي","احتمال تسمم","أهمية للتداول الصحي"], a: 0 },
+  { q: "الأغذية المعلبة غير الحمضية أكثر خطورة عند سوء المعاملة بسبب احتمال نمو:", opts: ["Clostridium botulinum","خميرة الخباز فقط","الملح","السكر"], a: 0 },
+  { q: "الهواء والأكسجين يؤثران في:", opts: ["الأكسدة والتزنخ وبعض تغيرات اللون","تكوين الثلج فقط","زيادة الملح","إزالة الرطوبة فوراً"], a: 0 },
+  { q: "الضوء قد يسرع فساد بعض الأغذية عن طريق:", opts: ["الأكسدة وتدهور بعض المركبات الحساسة","خفض الحرارة دائماً","تعقيم كامل","تكوين ملح"], a: 0 },
+  { q: "التسخين غير المناسب أثناء التجفيف قد يؤدي إلى:", opts: ["تغير لون أو نكهة وفقد بعض القيمة الغذائية","تحسن دائم بلا حدود","زيادة الماء","إلغاء الحاجة للعبوة"], a: 0 },
+  { q: "الرطوبة المتبقية في الغذاء المجفف يجب أن تكون:", opts: ["ضمن مستوى مناسب لنوع المنتج","مرتفعة دائماً","مساوية لرطوبة الغذاء الطازج","غير مهمة"], a: 0 },
+  { q: "التجفيف بالتجميد يتم عادة بعد:", opts: ["تجميد المنتج ثم إزالة الماء بالتسامي تحت تفريغ","إضافة الملح فقط","التخليل","التدخين"], a: 0 },
+  { q: "التدخين يستخدم كثيراً مع:", opts: ["اللحوم والأسماك","السكر النقي","الماء","الملح فقط"], a: 0 },
+  { q: "في التخليل، بكتيريا حمض اللاكتيك المفيدة تعمل على:", opts: ["تكوين حموضة تحفظ المنتج","إنتاج ثلج","رفع pH دائماً","إزالة الملح"], a: 0 },
+  { q: "السكر العالي في المربى يحفظ أساساً عبر:", opts: ["خفض النشاط المائي","رفع الماء الحر","زيادة pH بشدة","تكوين بروتين"], a: 0 },
+  { q: "الاختبار النهائي لجودة الحفظ يعتمد على:", opts: ["السلامة والجودة الحسية والالتزام بالمعايير","الشكل الخارجي فقط","السعر فقط","لون العبوة فقط"], a: 0 },
+  { q: "إذا ظهرت علامات فساد واضحة على الغذاء فيجب:", opts: ["استبعاده وعدم استهلاكه","خلطه مع غذاء سليم","زيادة الملح وتناوله فوراً دائماً","تجميده ليصبح آمناً تماماً"], a: 0 },
+  { q: "أكثر طرق الحفظ مناسبة لخفض الوزن وتسهيل النقل هي:", opts: ["التجفيف","التبريد فقط","الغسيل","الفرز"], a: 0 },
+  { q: "الحفظ بالتبريد يستخدم غالباً للمنتجات:", opts: ["الطازجة قصيرة العمر","الجافة جداً فقط","المعقمة تماماً فقط","الملحية فقط"], a: 0 },
+  { q: "السبب الأساسي لفساد الأغذية عالية الرطوبة بسرعة هو:", opts: ["توافر ماء مناسب لنمو الميكروبات والتفاعلات","انعدام الماء","كثرة العبوات","انخفاض الغذاء"], a: 0 },
+  { q: "الهدف من البنك الغذائي الجيد في التصنيع هو:", opts: ["حماية المستهلك وإطالة مدة الحفظ مع المحافظة على الجودة","تسريع الفساد","زيادة التلوث","إهمال المعايير"], a: 0 },
+  { q: "أي عامل من الآتي يزيد فرصة فساد الأغذية المخزنة؟", opts: ["ارتفاع الرطوبة وسوء التهوية","الجفاف المناسب","الحماية من الحشرات","التعبئة المحكمة"], a: 0 },
+  { q: "تستخدم درجات الحرارة المنخفضة في الحفظ أساساً لأنها:", opts: ["تبطئ التفاعلات الحيوية والكيميائية","تزيد نشاط الإنزيمات دائماً","ترفع عدد الميكروبات","تمنع الحاجة للنظافة"], a: 0 },
+  { q: "من علامات جودة المنتج المجفف:", opts: ["انخفاض الرطوبة مع احتفاظ مقبول باللون والطعم","رطوبة عالية وعفن","رائحة زنخة","امتصاص ماء من الجو"], a: 0 },
+  { q: "أفضل طريقة لاختيار وسيلة الحفظ هي مراعاة:", opts: ["نوع الغذاء وتركيبه ومدة الحفظ المطلوبة","لون الغلاف فقط","اسم المنتج فقط","السعر فقط"], a: 0 },
+];
+
+// ===================== STATE =====================
+let mode = 'all';
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = false;
+let wrongAnswers = [];
+
+// ===================== MODE SELECTION =====================
+function selectMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function startQuiz() {
+  buildQuestions();
+  current = 0; score = 0; answered = false; wrongAnswers = [];
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function buildQuestions() {
+  let tf = TF_QUESTIONS.map((q, i) => ({ ...q, type: 'tf', num: i + 1 }));
+  let mcq = MCQ_QUESTIONS.map((q, i) => ({ ...q, type: 'mcq', num: i + 101 }));
+  if (mode === 'all') questions = [...tf, ...mcq];
+  else if (mode === 'tf') questions = tf;
+  else if (mode === 'mcq') questions = mcq;
+  else {
+    let pool = [...tf, ...mcq];
+    shuffle(pool);
+    questions = pool.slice(0, 50);
+  }
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// ===================== RENDER =====================
+function renderQuestion() {
+  const q = questions[current];
+  const total = questions.length;
+
+  // topbar
+  document.getElementById('prog-text').textContent = `سؤال ${current + 1} من ${total}`;
+  const pct = Math.round((current / total) * 100);
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('live-score').textContent = score;
+
+  answered = false;
+  document.getElementById('next-btn').classList.remove('visible');
+
+  const badge = q.type === 'tf' ? '✅ صح أو خطأ' : '🔤 اختيار من متعدد';
+  let html = `<div class="q-type-badge">${badge}</div>`;
+  html += `<div class="q-card">`;
+  html += `<div class="q-num">سؤال <span>${q.num}</span></div>`;
+  html += `<div class="q-text">${q.q}</div>`;
+
+  if (q.type === 'tf') {
+    html += `<div class="tf-row">
+      <button class="opt-btn" onclick="answerTF(true, this)">✅ صح</button>
+      <button class="opt-btn" onclick="answerTF(false, this)">❌ خطأ</button>
+    </div>`;
+  } else {
+    const letters = ['أ', 'ب', 'ج', 'د'];
+    html += `<div class="mcq-list">`;
+    q.opts.forEach((opt, i) => {
+      html += `<button class="mcq-opt" onclick="answerMCQ(${i}, this)">
+        <span class="opt-letter">${letters[i]}</span>${opt}
+      </button>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div id="feedback"></div>`;
+  html += `</div>`;
+
+  document.getElementById('q-container').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function answerTF(chosen, btn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const correct = q.a;
+  const btns = document.querySelectorAll('.tf-row .opt-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const chosenCorrect = chosen === correct;
+  if (chosenCorrect) {
+    btn.classList.add('correct'); score++;
+    showFeedback(true);
+  } else {
+    btn.classList.add('wrong');
+    btns.forEach(b => {
+      if ((b.textContent.includes('صح') && correct) || (b.textContent.includes('خطأ') && !correct)) {
+        b.classList.add('correct');
+      }
+    });
+    showFeedback(false, correct ? 'الإجابة الصحيحة: صح' : 'الإجابة الصحيحة: خطأ');
+    wrongAnswers.push({ q: q.q, chosen: chosen ? 'صح' : 'خطأ', correct: correct ? 'صح' : 'خطأ', type: 'tf' });
+  }
+  document.getElementById('live-score').textContent = score;
+  document.getElementById('next-btn').classList.add('visible');
+}
+
+function answerMCQ(idx, btn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const correct = q.a;
+  const btns = document.querySelectorAll('.mcq-opt');
+  btns.forEach(b => b.disabled = true);
+
+  if (idx === correct) {
+    btn.classList.add('correct'); score++;
+    showFeedback(true);
+  } else {
+    btn.classList.add('wrong');
+    btns[correct].classList.add('correct');
+    showFeedback(false, `الإجابة الصحيحة: ${q.opts[correct]}`);
+    wrongAnswers.push({ q: q.q, chosen: q.opts[idx], correct: q.opts[correct], type: 'mcq' });
+  }
+  document.getElementById('live-score').textContent = score;
+  document.getElementById('next-btn').classList.add('visible');
+}
+
+function showFeedback(isCorrect, msg = '') {
+  const fb = document.getElementById('feedback');
+  if (isCorrect) {
+    fb.innerHTML = `<div class="feedback-box correct">✅ إجابة صحيحة! أحسنت.</div>`;
+  } else {
+    fb.innerHTML = `<div class="feedback-box wrong">❌ إجابة خاطئة. ${msg}</div>`;
+  }
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) showResults();
+  else renderQuestion();
+}
+
+// ===================== RESULTS =====================
+function showResults() {
+  showScreen('results');
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+
+  document.getElementById('res-pct').textContent = pct + '%';
+  document.getElementById('result-ring').style.setProperty('--pct', pct + '%');
+  document.getElementById('res-correct').textContent = score;
+  document.getElementById('res-wrong').textContent = total - score;
+  document.getElementById('res-total').textContent = total;
+
+  let title, sub;
+  if (pct >= 90) { title = 'ممتاز! 🏆'; sub = 'أداء رائع جداً، أنت متميز!'; }
+  else if (pct >= 75) { title = 'جيد جداً! 🎉'; sub = 'نتيجة ممتازة، استمر في التقدم!'; }
+  else if (pct >= 60) { title = 'جيد 👍'; sub = 'راجع الأسئلة الخاطئة لتحسين أدائك.'; }
+  else { title = 'تحتاج مراجعة 📚'; sub = 'راجع المادة وحاول مرة أخرى!'; }
+
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-sub').textContent = sub;
+
+  if (wrongAnswers.length > 0) {
+    const section = document.getElementById('wrong-review-section');
+    section.style.display = 'block';
+    document.getElementById('wrong-count-badge').textContent = `(${wrongAnswers.length})`;
+    let html = '';
+    wrongAnswers.forEach((w, i) => {
+      html += `<div class="wrong-item">
+        <div class="wi-q">${i + 1}. ${w.q}</div>
+        <div class="wi-row">
+          <span class="wi-wrong">❌ إجابتك: ${w.chosen}</span>
+          <span class="wi-correct">✅ الصواب: ${w.correct}</span>
+        </div>
+      </div>`;
+    });
+    document.getElementById('wrong-review-body').innerHTML = html;
+  }
+}
+
+function toggleWrongReview() {
+  const body = document.getElementById('wrong-review-body');
+  body.classList.toggle('open');
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answered = false; wrongAnswers = [];
+  buildQuestions();
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function goHome() {
+  showScreen('home');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
