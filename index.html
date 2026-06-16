@@ -831,7 +831,6 @@ function renderQuestion() {
   html += `</div>`;
 
   document.getElementById('q-container').innerHTML = html;
-  window.scrollTo(0, 0);
 }
 
 function answerTF(chosen, btn) {
@@ -954,7 +953,6 @@ function goHome() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
 }
 </script>
 </body>
